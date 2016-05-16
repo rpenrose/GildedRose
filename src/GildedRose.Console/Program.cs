@@ -4,6 +4,11 @@ namespace GildedRose.Console
 {
     public class Program
     {
+
+        public const string AgedBrie = "Aged Brie";
+        public const string Sulfuras = "Sulfuras, Hand of Ragnaros";
+        public const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
+
         // Do not alter this property due to Goblin ownership..
         IList<Item> Items;
 
@@ -37,6 +42,82 @@ namespace GildedRose.Console
         }
 
         public void UpdateQuality()
+        {
+            foreach (var item in Items)
+            {
+                if (item.Name != AgedBrie && item.Name != BackstagePasses)
+                {
+                    if (item.Quality > 0)
+                    {
+                        if (item.Name != Sulfuras)
+                        {
+                            item.Quality = item.Quality - 1;
+                        }
+                    }
+                }
+                else
+                {
+                    if (item.Quality < 50)
+                    {
+                        item.Quality = item.Quality + 1;
+
+                        if (item.Name == BackstagePasses)
+                        {
+                            if (item.SellIn < 11)
+                            {
+                                if (item.Quality < 50)
+                                {
+                                    item.Quality = item.Quality + 1;
+                                }
+                            }
+
+                            if (item.SellIn < 6)
+                            {
+                                if (item.Quality < 50)
+                                {
+                                    item.Quality = item.Quality + 1;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (item.Name != Sulfuras)
+                {
+                    item.SellIn = item.SellIn - 1;
+                }
+
+                if (item.SellIn < 0)
+                {
+                    if (item.Name != AgedBrie)
+                    {
+                        if (item.Name != BackstagePasses)
+                        {
+                            if (item.Quality > 0)
+                            {
+                                if (item.Name != Sulfuras)
+                                {
+                                    item.Quality = item.Quality - 1;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            item.Quality = item.Quality - item.Quality;
+                        }
+                    }
+                    else
+                    {
+                        if (item.Quality < 50)
+                        {
+                            item.Quality = item.Quality + 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void UpdateQualityOld()
         {
             for (var i = 0; i < Items.Count; i++)
             {

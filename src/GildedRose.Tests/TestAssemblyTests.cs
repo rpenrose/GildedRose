@@ -7,37 +7,34 @@ namespace GildedRose.Tests
 {
     public class TestAssemblyTests
     {
-        private const string AgedBrie = "Aged Brie";
-        private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
-        private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
+        private const int QualityOf20 = 20;
+
         private const string OtherProduct = "Any other Product";
 
-        private static readonly IEnumerable<string> AllProductNames = new List<string> { AgedBrie, Sulfuras, BackstagePasses, OtherProduct };
+        private static readonly IEnumerable<string> AllProductNames = new List<string> { Program.AgedBrie, Program.Sulfuras, Program.BackstagePasses, OtherProduct };
 
         [Theory]
-        [InlineData(Sulfuras, 20)]
-        [InlineData(OtherProduct, 20)]
-        public void TheQualityDegradesTwiceAsFastAfterSellByDate(string productName, int initialQuality)
+        [InlineData(Program.Sulfuras)]
+        [InlineData(OtherProduct)]
+        public void TheQualityDegradesTwiceAsFastAfterSellByDate(string productName)
         {
             // Arrange
-            var itemWithPositiveSellin = CreateItemWith(productName, initialQuality, sellIn: 1);
-            var itemWithNegativeSellin = CreateItemWith(productName, initialQuality, sellIn: 0);
+            var itemBeforeSellByDate = CreateItemWith(productName, QualityOf20, sellIn: 1);
+            var itemAfterSellByDate = CreateItemWith(productName, QualityOf20, sellIn: 0);
 
             // Act
-            ExecuteUpdateQuality(itemWithPositiveSellin, itemWithNegativeSellin);
+            ExecuteUpdateQuality(itemBeforeSellByDate, itemAfterSellByDate);
 
             // Assert
-            var degradationOfPositive = initialQuality - itemWithPositiveSellin.Quality;
-            var degradationOfNegative = initialQuality - itemWithNegativeSellin.Quality;
-            Assert.True(degradationOfNegative == (2 * degradationOfPositive),
-                $"Product: {productName}, Initial Quantity : {initialQuality}");
+            AssertQualityChangeDoublesAfterSellByDate(productName, QualityOf20, itemBeforeSellByDate, itemAfterSellByDate);
         }
 
         [Theory]
-        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(5)]
         [InlineData(0)]
         [InlineData(-1)]
-        public void TheQualityOfAnItemIsNeverBeNegative(int sellInDays)
+        public void TheQualityOfAnItemIsNeverNegative(int sellInDays)
         {
             // Arrange
             var items = AllProductNames.Select(name => CreateItemWith(name, initialQuality: 0, sellIn: sellInDays)).ToArray();
@@ -46,42 +43,107 @@ namespace GildedRose.Tests
             ExecuteUpdateQuality(items);
 
             // Assert
-            Assert.False(items.Any(i => i.Quality < 0), $"Negative Quantity found with Sell in days = {sellInDays}");
+            items.ToList().ForEach(AssertQualityGreaterThanOrEqualToZero);
         }
 
-        [Fact]
-        public void BackStagePassQualityIncreasesByTwoWhenTenDaysOrLess()
+        [Theory]
+        [InlineData(10)]
+        [InlineData(5)]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void AgedBrieQualityIncreaseInQualityAsItGetsOlder(int sellInDays)
         {
             // Arrange
-            const int initialQuality = 20;
-            var item = CreateItemWith(BackstagePasses, initialQuality, sellIn: 10);
+            var item = CreateItemWith(Program.AgedBrie, QualityOf20, sellIn: sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
-            Assert.Equal(initialQuality + 2, item.Quality);
+            Assert.True(item.Quality > QualityOf20, $"Sell in days: {sellInDays}");
         }
 
-        [Fact]
-        public void BackStagePassQualityIncreasesByThreeWhenFiveDaysOrLess()
+        [Theory]
+        [InlineData(52)]
+        [InlineData(10)]
+        [InlineData(5)]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void TheQualityOfAnItemIsNeverMoreThan50(int sellInDays)
         {
             // Arrange
-            const int initialQuality = 20;
-            var item = CreateItemWith(BackstagePasses, initialQuality, sellIn: 5);
+            const int qualityOfFifty = 50;
+            var items = AllProductNames.Select(name => CreateItemWith(name, qualityOfFifty, sellInDays)).ToArray();
+
+            // Act
+            ExecuteUpdateQuality(items);
+
+            // Assert
+            items.ToList().ForEach(item => AssertQualityIsLessThanOrEqualTo(item, qualityOfFifty));
+        }
+
+        [Theory]
+        [InlineData(10)]
+        [InlineData(5)]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void SulfurasNeverDecreasesInQuality(int sellInDays)
+        {
+            // Arrange
+            const int qualityOf80 = 80;
+            var item = CreateItemWith(Program.Sulfuras, qualityOf80, sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
-            Assert.Equal(initialQuality + 3, item.Quality);
+            Assert.True(qualityOf80 == item.Quality, $"Failed with SellIn days: {sellInDays}");
         }
 
         [Fact]
-        public void BackStagePassQualityIsZeroAfterConcert()
+        public void BackStagePassQualityIncreasesByOneWhenGreaterThanTenDaysToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(BackstagePasses, initialQuality: 10, sellIn: 0);
+            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 11);
+
+            // Act
+            ExecuteUpdateQuality(item);
+
+            // Assert
+            Assert.Equal(QualityOf20 + 1, item.Quality);
+        }
+
+        [Fact]
+        public void BackStagePassQualityIncreasesByTwoWhenTenDaysOrLessToSellByDate()
+        {
+            // Arrange
+            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 10);
+
+            // Act
+            ExecuteUpdateQuality(item);
+
+            // Assert
+            Assert.Equal(QualityOf20 + 2, item.Quality);
+        }
+
+        [Fact]
+        public void BackStagePassQualityIncreasesByThreeWhenFiveDaysOrLessToSellByDate()
+        {
+            // Arrange
+            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 5);
+
+            // Act
+            ExecuteUpdateQuality(item);
+
+            // Assert
+            Assert.Equal(QualityOf20 + 3, item.Quality);
+        }
+
+        [Fact]
+        public void BackStagePassQualityIsZeroAfterSellByDate()
+        {
+            // Arrange
+            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 0);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -90,69 +152,18 @@ namespace GildedRose.Tests
             Assert.Equal(0, item.Quality);
         }
 
-        [Theory]
-        [InlineData(AgedBrie, 20)]
-        [InlineData(BackstagePasses, 20)]
-        public void AgedBrieAndBackStagePassesIncreaseInQualityAsTheyGetOlder(string productName, int initialQuality)
-        {
-            // Arrange
-            var item = CreateItemWith(productName, initialQuality, 20);
-
-            // Act
-            ExecuteUpdateQuality(item);
-
-            // Assert
-            Assert.True(item.Quality > initialQuality, $"Product: {productName}, Initial Quantity : {initialQuality}");
-        }
-
         //TODO - This is not a specified requirement, but is a feature that has been detected in testing. Need to check with product owner.
         [Fact]
         public void AgedBrieQualityIncreaseTwiceAsFastAfterSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(AgedBrie, 0, 0);
+            var item = CreateItemWith(Program.AgedBrie, 0, 0);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
             Assert.Equal(2, item.Quality);
-        }
-
-        [Theory]
-        [InlineData(1)]
-        [InlineData(0)]
-        public void SulfurasNeverDecreasesInQuality(int sellInDays)
-        {
-            // Arrange
-            const int initialQuality = 10;
-            var item = CreateItemWith(Sulfuras, initialQuality, sellInDays);
-
-            // Act
-            ExecuteUpdateQuality(item);
-
-            // Assert
-            Assert.True(initialQuality == item.Quality, $"Failed with SellIn days: {sellInDays}");
-        }
-
-        [Theory]
-        [InlineData(AgedBrie, 1)]
-        [InlineData(AgedBrie, 0)]
-        [InlineData(BackstagePasses, 10)]
-        [InlineData(BackstagePasses, 5)]
-        [InlineData(BackstagePasses, 10)]
-        [InlineData(BackstagePasses, 0)]
-        public void TheQualityOfAnItemIsNeverMoreThan50(string productName, int sellInDays)
-        {
-            // Arrange
-            const int qualityOfFifty = 50;
-            var item = CreateItemWith(productName, qualityOfFifty, sellInDays);
-
-            // Act
-            ExecuteUpdateQuality(item);
-
-            // Assert
-            Assert.True(item.Quality <= qualityOfFifty, $"Failed for product: {productName}, with SellIn days: {sellInDays}");
         }
 
         private static Item CreateItemWith(string productName, int initialQuality, int sellIn)
@@ -165,5 +176,26 @@ namespace GildedRose.Tests
             var program = new Program { CurrentItems = items };
             program.UpdateQuality();
         }
+
+        private static void AssertQualityChangeDoublesAfterSellByDate(string productName,
+                                int initialQuality, Item itemBeforeSellByDate, Item itemAfterSellByDate)
+        {
+            var changeBeforeSellByDate = initialQuality - itemBeforeSellByDate.Quality;
+            var changeAfterSellByDate = initialQuality - itemAfterSellByDate.Quality;
+            var changeAfterIsDouble = changeAfterSellByDate == (2 * changeBeforeSellByDate);
+
+            Assert.True(changeAfterIsDouble, $"Product: {productName}, Initial Quantity : {initialQuality}");
+        }
+
+        private static void AssertQualityIsLessThanOrEqualTo(Item item, int qualityOfFifty)
+        {
+            Assert.True(item.Quality <= qualityOfFifty, $"Failed for product: {item.Name} with SellIn days: {item.SellIn}");
+        }
+
+        private static void AssertQualityGreaterThanOrEqualToZero(Item item)
+        {
+            Assert.True(item.Quality >= 0, $"Negative quality for product: {item.Name}, SellInDays: {item.SellIn}");
+        }
+
     }
 }
