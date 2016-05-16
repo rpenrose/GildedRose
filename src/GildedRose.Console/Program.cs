@@ -50,30 +50,21 @@ namespace GildedRose.Console
                 switch (item.Name)
                 {
                     case AgedBrie:
-                        ProcessAgedBrie(item);
+                        AdjustQualityUsingStepIncrement(item, -1);
                         break;
                     case BackstagePasses:
-                        ProcessBackstagePass(item);
+                        AdjustQualityUsingSlidingScale(item);
                         break;
                     case Sulfuras:
-                        ProcessSulfuras(item);
                         break;
                     default:
-                        ProcessOtherItem(item);
+                        AdjustQualityUsingStepIncrement(item, 1);
                         break;
                 }
             }
         }
 
-        private static void ProcessAgedBrie(Item item)
-        {
-            item.SellIn = item.SellIn - 1;
-            var increment = (item.SellIn < 0) ? 2 : 1;
-
-            item.Quality = IncrementQuality(item, increment);
-        }
-
-        public void ProcessBackstagePass(Item item)
+        public void AdjustQualityUsingSlidingScale(Item item)
         {
             // Work out the increment.
             var increment = 1;
@@ -92,16 +83,11 @@ namespace GildedRose.Console
             }
         }
 
-        private void ProcessSulfuras(Item item)
-        {
-            // Do nothing for Sulfuras.
-        }
-
-        private static void ProcessOtherItem(Item item)
+        private static void AdjustQualityUsingStepIncrement(Item item, int initialIncrement)
         {
             item.SellIn = item.SellIn - 1;
 
-            var increment = (item.SellIn < 0) ? -2 : -1;
+            var increment = initialIncrement * ((item.SellIn < 0) ? -2 : -1);
 
             item.Quality = IncrementQuality(item, increment);
         }
