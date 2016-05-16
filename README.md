@@ -1,14 +1,15 @@
 ## Richard's Notes
 
 ### Interesting behaviour
-When writing the initial set of tests I noticed that the quality of Aged Brie actually increases twice as fast after the Sell By Date. This is not specified in the requirements, but I have written a test for this behaviour and have preserved it in the re factored code.
+When writing the initial set of tests I noticed the following:
 
-I also noticed that when an item has an initial Quality of > 50 then the Quality will be reduced just like and other Quality value, even if the Quality remains above the 50 threshold. However, the code will never increase a Quality above 50. This is implied in the specification, but very subtly. 
+1. The quality of Aged Brie actually increases twice as fast after the Sell By Date. This is not specified in the requirements, but I have written a test for this behaviour and have preserved it in the re factored code.
+2. When an item has an initial Quality of > 50 then the Quality will be reduced just like and other Quality value, even if the Quality remains above the 50 threshold. However, the code will never increase a Quality above 50. This is implied in the specification, but very subtly. 
 
-This would need to be reviewed with the product owner as it doesn't make sense (to me at least).
+Point 1 above would need to be reviewed with the product owner as it doesn't make sense (to me at least).
 
-### Final Solution
-In my final solution I separated the incrementing of the SellIn date from the calculation of the new quality value. The new code uses a set set of QualityCalculator's and a QualityCalculatorFactory which provides the correct calculator for the item being processed. The quality calculators share a utility class called QualityIncrementor for incrementing the quality values so that some logic can be shared.
+### My Solution
+In my solution I separated the incrementing of the SellIn days property from the calculation of the new quality value. The new code uses a set of QualityCalculator's and a QualityCalculatorFactory which provides the correct calculator for the item being processed. The quality calculators share a utility class called QualityIncrementor for incrementing the quality value so that some logic can be shared.
 
 ### Assumptions
 The specification infers (but doesn't explicitly state) that the code should be able to handle multiple variations of each product type, despite the fact that the original code had hard coded values for specific products, e.g. *"Backstage passes to a TAFKAL80ETC concert"*
@@ -16,7 +17,7 @@ The specification infers (but doesn't explicitly state) that the code should be 
 In the real world I would validate this requirement with the product owner, but my code assumes that any product beginning with "Backstage passes" or "Conjured"  for example would be a Backstage pass or Conjured item. This change did not break any of the tests.
 
 ### Things I didn't do
-1. I could have used an IOC container for this solution but choose not to when reflecting on Tom's advice not to over engineer the solution. I don't think that the complexity of the code quite warrants an IOC container as the end to end tests are fairly manageable at this point. If the code changed further this would have been a consideration.
+1. I choose not to use an IOC container for this solution when reflecting on Tom's advice not to over engineer the solution. I don't think that the complexity of the code quite warrants an IOC container as the end to end tests are fairly manageable at this point. If the code changed further this would have been a consideration.
 2. I did not move the Item class into it's own file. I would normally do this but was unsure whether this would enrage the Goblin?
 
 ##Gilded Rose Refactoring Kata
