@@ -2,16 +2,18 @@
 
 namespace GildedRose.Console
 {
-    class Program
+    public class Program
     {
+        // Do not alter this property due to Goblin ownership..
         IList<Item> Items;
+
         static void Main(string[] args)
         {
             System.Console.WriteLine("OMGHAI!");
 
             var app = new Program()
-                          {
-                              Items = new List<Item>
+            {
+                Items = new List<Item>
                                           {
                                               new Item {Name = "+5 Dexterity Vest", SellIn = 10, Quality = 20},
                                               new Item {Name = "Aged Brie", SellIn = 2, Quality = 0},
@@ -26,7 +28,7 @@ namespace GildedRose.Console
                                               new Item {Name = "Conjured Mana Cake", SellIn = 3, Quality = 6}
                                           }
 
-                          };
+            };
 
             app.UpdateQuality();
 
@@ -110,8 +112,15 @@ namespace GildedRose.Console
             }
         }
 
+        public IList<Item> CurrentItems
+        {
+            get { return Items; }
+            set { Items = value; }
+        }
     }
 
+
+    // Do not alter this class due to Goblin ownership..
     public class Item
     {
         public string Name { get; set; }
