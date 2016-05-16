@@ -18,6 +18,9 @@
             if (productName.StartsWith(Constants.Sulfuras))
                 return new NoChangeQualityCalculator();
 
+            if (productName.StartsWith(Constants.Conjured))
+                return new IncrementingQualityCalculator(new QualityIncrementor(), 2);
+
             return new IncrementingQualityCalculator(new QualityIncrementor(), 1);
         }
     }

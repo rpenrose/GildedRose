@@ -11,6 +11,7 @@ namespace GildedRose.Tests.Calculators
         [InlineData("Backstage passes of some kind", typeof(StepIncrementingQualityCalculator))]
         [InlineData("Sulfuras", typeof(NoChangeQualityCalculator))]
         [InlineData("Other", typeof(IncrementingQualityCalculator))]
+        [InlineData("Conjured something or other", typeof(IncrementingQualityCalculator))]
         public void CreateForShouldCreateTheCorrectCalculatorForEachProduct(string productName, Type expectedType)
         {
             var calculator = (new QualityCalculatorFactory()).CreateFor(productName);

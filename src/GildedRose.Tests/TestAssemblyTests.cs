@@ -9,12 +9,16 @@ namespace GildedRose.Tests
     {
         private const int QualityOf20 = 20;
 
-        private const string OtherProduct = "Any other Product";
+        private const string OtherProduct = "Any old product";
+        private const string AgedBrie = "Aged Brie particularly smelly variety";
+        private const string Sulfuras = "Sulfuras, Hand of Ragnaros";
+        private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
+        private const string Conjured = "Conjured Mana Cake";
 
-        private static readonly IEnumerable<string> AllProductNames = new List<string> { Constants.AgedBrie, Constants.Sulfuras, Constants.BackstagePasses, OtherProduct };
+        private static readonly IEnumerable<string> AllProductNames = new List<string> { AgedBrie, Sulfuras, BackstagePasses, OtherProduct, Conjured };
 
         [Theory]
-        [InlineData(Constants.Sulfuras)]
+        [InlineData(Sulfuras)]
         [InlineData(OtherProduct)]
         public void TheQualityDegradesTwiceAsFastAfterSellByDate(string productName)
         {
@@ -56,7 +60,7 @@ namespace GildedRose.Tests
         public void AgedBrieQualityIncreaseInQualityAsItGetsOlder(int sellInDays)
         {
             // Arrange
-            var item = CreateItemWith(Constants.AgedBrie, QualityOf20, sellIn: sellInDays);
+            var item = CreateItemWith(AgedBrie, QualityOf20, sellIn: sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -93,7 +97,7 @@ namespace GildedRose.Tests
         {
             // Arrange
             const int qualityOf80 = 80;
-            var item = CreateItemWith(Constants.Sulfuras, qualityOf80, sellInDays);
+            var item = CreateItemWith(Sulfuras, qualityOf80, sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -106,7 +110,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByOneWhenGreaterThanTenDaysToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 11);
+            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 11);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -119,7 +123,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByTwoWhenTenDaysOrLessToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 10);
+            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 10);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -132,7 +136,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByThreeWhenFiveDaysOrLessToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 5);
+            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 5);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -145,7 +149,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIsZeroAfterSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 0);
+            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 0);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -159,13 +163,33 @@ namespace GildedRose.Tests
         public void AgedBrieQualityIncreaseTwiceAsFastAfterSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Constants.AgedBrie, 0, 0);
+            var item = CreateItemWith(AgedBrie, 0, 0);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
             Assert.Equal(2, item.Quality);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(0)]
+        public void ConjuredItemsDegradeTwiceAsFast(int sellInDays)
+        {
+            var quality = 20;
+
+            // Arrange
+            var conjuredItem = CreateItemWith(Conjured, quality, sellInDays);
+            var normalItem = CreateItemWith(OtherProduct, quality, sellInDays);
+
+            // Act
+            ExecuteUpdateQuality(conjuredItem, normalItem);
+
+            // Assert
+            var changeForConjured = quality - conjuredItem.Quality;
+            var changeForNormal = quality - normalItem.Quality;
+            Assert.True(changeForConjured == (2 * changeForNormal));
         }
 
         private static Item CreateItemWith(string productName, int initialQuality, int sellIn)
