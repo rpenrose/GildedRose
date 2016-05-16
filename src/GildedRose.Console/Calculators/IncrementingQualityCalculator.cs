@@ -13,7 +13,7 @@
 
         public int Calculate(Item item)
         {
-            var increment = _increment * ((item.SellIn < 0) ? -2 : -1);
+            var increment = _increment * (item.IsPassedSellbyDate() ? -2 : -1);
 
             var newQuality = _incrementor.Increment(item, increment);
 

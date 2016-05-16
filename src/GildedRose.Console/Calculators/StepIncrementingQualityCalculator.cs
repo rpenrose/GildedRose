@@ -21,7 +21,7 @@
 
             var newQuality = _incrementor.Increment(item, increment);
 
-            if (item.SellIn < 0)
+            if (item.IsPassedSellbyDate())
             {
                 newQuality = 0;
             }
