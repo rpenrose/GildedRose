@@ -66,22 +66,22 @@ namespace GildedRose.Tests
         }
 
         [Theory]
-        [InlineData(52)]
-        [InlineData(10)]
-        [InlineData(5)]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public void TheQualityOfAnItemDoesntIncreaseAboveThan50(int sellInDays)
+        [InlineData(1, 50)]
+        [InlineData(0, 50)]
+        [InlineData(-1, 50)]
+        [InlineData(1, 49)]
+        [InlineData(0, 49)]
+        [InlineData(-1, 49)]
+        public void TheQualityOfAnItemDoesntIncreaseAboveThan50(int sellInDays, int quality)
         {
             // Arrange
-            const int qualityOfFifty = 50;
-            var items = AllProductNames.Select(name => CreateItemWith(name, qualityOfFifty, sellInDays)).ToArray();
+            var items = AllProductNames.Select(name => CreateItemWith(name, quality, sellInDays)).ToArray();
 
             // Act
             ExecuteUpdateQuality(items);
 
             // Assert
-            items.ToList().ForEach(item => AssertQualityIsLessThanOrEqualTo(item, qualityOfFifty));
+            items.ToList().ForEach(item => AssertQualityIsLessThanOrEqualTo(item, 50));
         }
 
         [Theory]
