@@ -30,14 +30,16 @@ namespace GildedRose.Tests
         }
 
         [Theory]
-        [InlineData(10)]
-        [InlineData(5)]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public void TheQualityOfAnItemIsNeverNegative(int sellInDays)
+        [InlineData(1, 1)]
+        [InlineData(0, 1)]
+        [InlineData(-1, 1)]
+        [InlineData(1, 0)]
+        [InlineData(0, 0)]
+        [InlineData(-1, 0)]
+        public void TheQualityOfAnItemIsNeverNegative(int sellInDays, int quality)
         {
             // Arrange
-            var items = AllProductNames.Select(name => CreateItemWith(name, initialQuality: 0, sellIn: sellInDays)).ToArray();
+            var items = AllProductNames.Select(name => CreateItemWith(name, quality, sellInDays)).ToArray();
 
             // Act
             ExecuteUpdateQuality(items);
