@@ -54,7 +54,7 @@ namespace GildedRose.Tests.Calculators
 
         private static int CallCalculate(int initialQuality, int sellIn)
         {
-            var calculator = new StepIncrementingQualityCalculator();
+            var calculator = new StepIncrementingQualityCalculator(new QualityIncrementor());
             var newQuality = calculator.Calculate(new Item { Quality = initialQuality, SellIn = sellIn });
             return newQuality;
         }

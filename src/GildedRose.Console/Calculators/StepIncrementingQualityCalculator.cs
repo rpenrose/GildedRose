@@ -2,6 +2,13 @@
 {
     public class StepIncrementingQualityCalculator : IQualityCalculator
     {
+        private readonly IQualityIncrementor _incrementor;
+
+        public StepIncrementingQualityCalculator(IQualityIncrementor incrementor)
+        {
+            _incrementor = incrementor;
+        }
+
         public int Calculate(Item item)
         {
             // Work out the increment.
@@ -12,7 +19,7 @@
             if (item.SellIn < 5)
                 increment = 3;
 
-            var newQuality = IncrementQuality(item, increment);
+            var newQuality = _incrementor.Increment(item, increment);
 
             if (item.SellIn < 0)
             {
@@ -20,16 +27,6 @@
             }
 
             return newQuality;
-        }
-
-        private static int IncrementQuality(Item item, int increment = 1)
-        {
-            var quality = item.Quality + increment;
-
-            if (quality < 0)
-                quality = 0;
-
-            return quality > Program.MaximumQuality ? Program.MaximumQuality : quality;
         }
     }
 }
