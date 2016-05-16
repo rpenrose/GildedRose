@@ -61,57 +61,34 @@ namespace GildedRose.Console
                     default:
                         ProcessOtherItem(item);
                         break;
-
                 }
             }
         }
 
         private static void ProcessAgedBrie(Item item)
         {
-            if (item.Quality < MaximumQuality)
-            {
-                item.Quality = item.Quality + 1;
-            }
-
             item.SellIn = item.SellIn - 1;
+            var increment = (item.SellIn < 0) ? 2 : 1;
 
-            if (item.SellIn < 0)
-            {
-                if (item.Quality < MaximumQuality)
-                {
-                    item.Quality = item.Quality + 1;
-                }
-            }
+            item.Quality = IncrementQuality(item, increment);
         }
 
         public void ProcessBackstagePass(Item item)
         {
-            if (item.Quality < MaximumQuality)
-            {
-                item.Quality = item.Quality + 1;
+            // Work out the increment.
+            var increment = 1;
+            if (item.SellIn < 11)
+                increment = 2;
+            if (item.SellIn < 6)
+                increment = 3;
 
-                if (item.SellIn < 11)
-                {
-                    if (item.Quality < MaximumQuality)
-                    {
-                        item.Quality = item.Quality + 1;
-                    }
-                }
-
-                if (item.SellIn < 6)
-                {
-                    if (item.Quality < MaximumQuality)
-                    {
-                        item.Quality = item.Quality + 1;
-                    }
-                }
-            }
+            item.Quality = IncrementQuality(item, increment);
 
             item.SellIn = item.SellIn - 1;
 
             if (item.SellIn < 0)
             {
-                item.Quality = item.Quality - item.Quality;
+                item.Quality = 0;
             }
         }
 
@@ -124,15 +101,19 @@ namespace GildedRose.Console
         {
             item.SellIn = item.SellIn - 1;
 
-            if (item.Quality > 0)
-            {
-                item.Quality = item.Quality - 1;
-                if (item.SellIn < 0 && item.Quality > 0)
-                {
-                    item.Quality = item.Quality - 1;
-                }
+            var increment = (item.SellIn < 0) ? -2 : -1;
 
-            }
+            item.Quality = IncrementQuality(item, increment);
+        }
+
+        private static int IncrementQuality(Item item, int increment = 1)
+        {
+            var quality = item.Quality + increment;
+
+            if (quality < 0)
+                quality = 0;
+
+            return quality > MaximumQuality ? MaximumQuality : quality;
         }
 
         public void UpdateQualityOld()
@@ -217,7 +198,6 @@ namespace GildedRose.Console
             set { Items = value; }
         }
     }
-
 
     // Do not alter this class due to Goblin ownership..
     public class Item
