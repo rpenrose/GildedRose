@@ -9,6 +9,8 @@ namespace GildedRose.Console
         public const string Sulfuras = "Sulfuras, Hand of Ragnaros";
         public const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
 
+        private const int MaximumQuality = 50;
+
         // Do not alter this property due to Goblin ownership..
         IList<Item> Items;
 
@@ -45,75 +47,91 @@ namespace GildedRose.Console
         {
             foreach (var item in Items)
             {
-                if (item.Name != AgedBrie && item.Name != BackstagePasses)
+                switch (item.Name)
                 {
-                    if (item.Quality > 0)
-                    {
-                        if (item.Name != Sulfuras)
-                        {
-                            item.Quality = item.Quality - 1;
-                        }
-                    }
+                    case AgedBrie:
+                        ProcessAgedBrie(item);
+                        break;
+                    case BackstagePasses:
+                        ProcessBackstagePass(item);
+                        break;
+                    case Sulfuras:
+                        ProcessSulfuras(item);
+                        break;
+                    default:
+                        ProcessOtherItem(item);
+                        break;
+
                 }
-                else
+            }
+        }
+
+        private static void ProcessAgedBrie(Item item)
+        {
+            if (item.Quality < MaximumQuality)
+            {
+                item.Quality = item.Quality + 1;
+            }
+
+            item.SellIn = item.SellIn - 1;
+
+            if (item.SellIn < 0)
+            {
+                if (item.Quality < MaximumQuality)
                 {
-                    if (item.Quality < 50)
+                    item.Quality = item.Quality + 1;
+                }
+            }
+        }
+
+        public void ProcessBackstagePass(Item item)
+        {
+            if (item.Quality < MaximumQuality)
+            {
+                item.Quality = item.Quality + 1;
+
+                if (item.SellIn < 11)
+                {
+                    if (item.Quality < MaximumQuality)
                     {
                         item.Quality = item.Quality + 1;
-
-                        if (item.Name == BackstagePasses)
-                        {
-                            if (item.SellIn < 11)
-                            {
-                                if (item.Quality < 50)
-                                {
-                                    item.Quality = item.Quality + 1;
-                                }
-                            }
-
-                            if (item.SellIn < 6)
-                            {
-                                if (item.Quality < 50)
-                                {
-                                    item.Quality = item.Quality + 1;
-                                }
-                            }
-                        }
                     }
                 }
 
-                if (item.Name != Sulfuras)
+                if (item.SellIn < 6)
                 {
-                    item.SellIn = item.SellIn - 1;
+                    if (item.Quality < MaximumQuality)
+                    {
+                        item.Quality = item.Quality + 1;
+                    }
+                }
+            }
+
+            item.SellIn = item.SellIn - 1;
+
+            if (item.SellIn < 0)
+            {
+                item.Quality = item.Quality - item.Quality;
+            }
+        }
+
+        private void ProcessSulfuras(Item item)
+        {
+            // Do nothing for Sulfuras.
+        }
+
+        private static void ProcessOtherItem(Item item)
+        {
+            item.SellIn = item.SellIn - 1;
+
+            if (item.Quality > 0)
+            {
+                item.Quality = item.Quality - 1;
+                if (item.SellIn < 0 && item.Quality > 0)
+                {
+                    item.Quality = item.Quality - 1;
                 }
 
-                if (item.SellIn < 0)
-                {
-                    if (item.Name != AgedBrie)
-                    {
-                        if (item.Name != BackstagePasses)
-                        {
-                            if (item.Quality > 0)
-                            {
-                                if (item.Name != Sulfuras)
-                                {
-                                    item.Quality = item.Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            item.Quality = item.Quality - item.Quality;
-                        }
-                    }
-                    else
-                    {
-                        if (item.Quality < 50)
-                        {
-                            item.Quality = item.Quality + 1;
-                        }
-                    }
-                }
             }
         }
 
