@@ -9,7 +9,7 @@ namespace GildedRose.Console
         public const string Sulfuras = "Sulfuras, Hand of Ragnaros";
         public const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
 
-        private const int MaximumQuality = 50;
+        public const int MaximumQuality = 50;
 
         // Do not alter this property due to Goblin ownership..
         IList<Item> Items;
@@ -47,6 +47,8 @@ namespace GildedRose.Console
         {
             foreach (var item in Items)
             {
+                item.SellIn = item.SellIn - 1;
+
                 switch (item.Name)
                 {
                     case AgedBrie:
@@ -68,14 +70,13 @@ namespace GildedRose.Console
         {
             // Work out the increment.
             var increment = 1;
-            if (item.SellIn < 11)
+
+            if (item.SellIn < 10)
                 increment = 2;
-            if (item.SellIn < 6)
+            if (item.SellIn < 5)
                 increment = 3;
 
             item.Quality = IncrementQuality(item, increment);
-
-            item.SellIn = item.SellIn - 1;
 
             if (item.SellIn < 0)
             {
@@ -85,8 +86,6 @@ namespace GildedRose.Console
 
         private static void AdjustQualityUsingStepIncrement(Item item, int initialIncrement)
         {
-            item.SellIn = item.SellIn - 1;
-
             var increment = initialIncrement * ((item.SellIn < 0) ? -2 : -1);
 
             item.Quality = IncrementQuality(item, increment);
