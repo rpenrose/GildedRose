@@ -7,7 +7,7 @@ namespace GildedRose.Tests
 {
     public class TestAssemblyTests
     {
-        private const int QualityOf20 = 20;
+        private const int ArbitraryQuality = 20;
 
         private const string OtherProduct = "Any old product";
         private const string AgedBrie = "Aged Brie particularly smelly variety";
@@ -23,14 +23,14 @@ namespace GildedRose.Tests
         public void TheQualityDegradesTwiceAsFastAfterSellByDate(string productName)
         {
             // Arrange
-            var itemBeforeSellByDate = CreateItemWith(productName, QualityOf20, sellIn: 1);
-            var itemAfterSellByDate = CreateItemWith(productName, QualityOf20, sellIn: 0);
+            var itemBeforeSellByDate = CreateItemWith(productName, ArbitraryQuality, sellIn: 1);
+            var itemAfterSellByDate = CreateItemWith(productName, ArbitraryQuality, sellIn: 0);
 
             // Act
             ExecuteUpdateQuality(itemBeforeSellByDate, itemAfterSellByDate);
 
             // Assert
-            AssertQualityChangeDoublesAfterSellByDate(productName, QualityOf20, itemBeforeSellByDate, itemAfterSellByDate);
+            AssertQualityChangeDoublesAfterSellByDate(productName, ArbitraryQuality, itemBeforeSellByDate, itemAfterSellByDate);
         }
 
         [Theory]
@@ -60,23 +60,23 @@ namespace GildedRose.Tests
         public void AgedBrieQualityIncreaseInQualityAsItGetsOlder(int sellInDays)
         {
             // Arrange
-            var item = CreateItemWith(AgedBrie, QualityOf20, sellIn: sellInDays);
+            var item = CreateItemWith(AgedBrie, ArbitraryQuality, sellIn: sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
-            Assert.True(item.Quality > QualityOf20, $"Sell in days: {sellInDays}");
+            Assert.True(item.Quality > ArbitraryQuality, $"Sell in days: {sellInDays}");
         }
 
         [Theory]
-        [InlineData(1, 50)]
-        [InlineData(0, 50)]
-        [InlineData(-1, 50)]
-        [InlineData(1, 49)]
-        [InlineData(0, 49)]
-        [InlineData(-1, 49)]
-        public void TheQualityOfAnItemDoesntIncreaseAboveThan50(int sellInDays, int quality)
+        [InlineData(1, Constants.MaximumQuality)]
+        [InlineData(0, Constants.MaximumQuality)]
+        [InlineData(-1, Constants.MaximumQuality)]
+        [InlineData(1, Constants.MaximumQuality - 1)]
+        [InlineData(0, Constants.MaximumQuality - 1)]
+        [InlineData(-1, Constants.MaximumQuality - 1)]
+        public void TheQualityOfAnItemDoesntIncreaseAboveThanMaximum(int sellInDays, int quality)
         {
             // Arrange
             var items = AllProductNames.Select(name => CreateItemWith(name, quality, sellInDays)).ToArray();
@@ -85,7 +85,7 @@ namespace GildedRose.Tests
             ExecuteUpdateQuality(items);
 
             // Assert
-            items.ToList().ForEach(item => AssertQualityIsLessThanOrEqualTo(item, 50));
+            items.ToList().ForEach(item => AssertQualityIsLessThanOrEqualTo(item, Constants.MaximumQuality));
         }
 
         [Theory]
@@ -110,46 +110,46 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByOneWhenGreaterThanTenDaysToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 11);
+            var item = CreateItemWith(BackstagePasses, ArbitraryQuality, sellIn: 11);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
-            Assert.Equal(QualityOf20 + 1, item.Quality);
+            Assert.Equal(ArbitraryQuality + 1, item.Quality);
         }
 
         [Fact]
         public void BackStagePassQualityIncreasesByTwoWhenTenDaysOrLessToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 10);
+            var item = CreateItemWith(BackstagePasses, ArbitraryQuality, sellIn: 10);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
-            Assert.Equal(QualityOf20 + 2, item.Quality);
+            Assert.Equal(ArbitraryQuality + 2, item.Quality);
         }
 
         [Fact]
         public void BackStagePassQualityIncreasesByThreeWhenFiveDaysOrLessToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 5);
+            var item = CreateItemWith(BackstagePasses, ArbitraryQuality, sellIn: 5);
 
             // Act
             ExecuteUpdateQuality(item);
 
             // Assert
-            Assert.Equal(QualityOf20 + 3, item.Quality);
+            Assert.Equal(ArbitraryQuality + 3, item.Quality);
         }
 
         [Fact]
         public void BackStagePassQualityIsZeroAfterSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(BackstagePasses, QualityOf20, sellIn: 0);
+            var item = CreateItemWith(BackstagePasses, ArbitraryQuality, sellIn: 0);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -213,9 +213,9 @@ namespace GildedRose.Tests
             Assert.True(changeAfterIsDouble, $"Product: {productName}, Initial Quantity : {initialQuality}");
         }
 
-        private static void AssertQualityIsLessThanOrEqualTo(Item item, int qualityOfFifty)
+        private static void AssertQualityIsLessThanOrEqualTo(Item item, int quality)
         {
-            Assert.True(item.Quality <= qualityOfFifty, $"Failed for product: {item.Name} with SellIn days: {item.SellIn}");
+            Assert.True(item.Quality <= quality, $"Failed for product: {item.Name} with SellIn days: {item.SellIn}");
         }
 
         private static void AssertQualityGreaterThanOrEqualToZero(Item item)
