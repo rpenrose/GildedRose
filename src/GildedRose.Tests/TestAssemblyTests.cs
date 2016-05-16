@@ -69,7 +69,7 @@ namespace GildedRose.Tests
         [InlineData(5)]
         [InlineData(0)]
         [InlineData(-1)]
-        public void TheQualityOfAnItemIsNeverMoreThan50(int sellInDays)
+        public void TheQualityOfAnItemDoesntIncreaseAboveThan50(int sellInDays)
         {
             // Arrange
             const int qualityOfFifty = 50;
