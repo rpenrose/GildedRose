@@ -1,18 +1,22 @@
 ﻿using System.Collections.Generic;
+using GildedRose.Console.Calculators;
 
 namespace GildedRose.Console
 {
     public class Program
     {
-
-        public const string AgedBrie = "Aged Brie";
-        public const string Sulfuras = "Sulfuras, Hand of Ragnaros";
-        public const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
-
-        public const int MaximumQuality = 50;
-
+        private readonly IQualityCalculatorFactory _qualityCalculatorFactory;
         // Do not alter this property due to Goblin ownership..
         IList<Item> Items;
+
+        public Program(IQualityCalculatorFactory qualityCalculatorFactory)
+        {
+            _qualityCalculatorFactory = qualityCalculatorFactory;
+        }
+
+        public Program() : this(new QualityCalculatorFactory())
+        {            
+        }
 
         static void Main(string[] args)
         {
@@ -49,131 +53,9 @@ namespace GildedRose.Console
             {
                 item.SellIn = item.SellIn - 1;
 
-                switch (item.Name)
-                {
-                    case AgedBrie:
-                        AdjustQualityUsingStepIncrement(item, -1);
-                        break;
-                    case BackstagePasses:
-                        AdjustQualityUsingSlidingScale(item);
-                        break;
-                    case Sulfuras:
-                        break;
-                    default:
-                        AdjustQualityUsingStepIncrement(item, 1);
-                        break;
-                }
-            }
-        }
+                var qualityCalculator = _qualityCalculatorFactory.CreateFor(item.Name);
 
-        public void AdjustQualityUsingSlidingScale(Item item)
-        {
-            // Work out the increment.
-            var increment = 1;
-
-            if (item.SellIn < 10)
-                increment = 2;
-            if (item.SellIn < 5)
-                increment = 3;
-
-            item.Quality = IncrementQuality(item, increment);
-
-            if (item.SellIn < 0)
-            {
-                item.Quality = 0;
-            }
-        }
-
-        private static void AdjustQualityUsingStepIncrement(Item item, int initialIncrement)
-        {
-            var increment = initialIncrement * ((item.SellIn < 0) ? -2 : -1);
-
-            item.Quality = IncrementQuality(item, increment);
-        }
-
-        private static int IncrementQuality(Item item, int increment = 1)
-        {
-            var quality = item.Quality + increment;
-
-            if (quality < 0)
-                quality = 0;
-
-            return quality > MaximumQuality ? MaximumQuality : quality;
-        }
-
-        public void UpdateQualityOld()
-        {
-            for (var i = 0; i < Items.Count; i++)
-            {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                {
-                    if (Items[i].Quality > 0)
-                    {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                        {
-                            Items[i].Quality = Items[i].Quality - 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                {
-                    Items[i].SellIn = Items[i].SellIn - 1;
-                }
-
-                if (Items[i].SellIn < 0)
-                {
-                    if (Items[i].Name != "Aged Brie")
-                    {
-                        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                        }
-                    }
-                    else
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality = Items[i].Quality + 1;
-                        }
-                    }
-                }
+                item.Quality = qualityCalculator.Calculate(item);
             }
         }
 

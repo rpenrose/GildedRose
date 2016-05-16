@@ -11,10 +11,10 @@ namespace GildedRose.Tests
 
         private const string OtherProduct = "Any other Product";
 
-        private static readonly IEnumerable<string> AllProductNames = new List<string> { Program.AgedBrie, Program.Sulfuras, Program.BackstagePasses, OtherProduct };
+        private static readonly IEnumerable<string> AllProductNames = new List<string> { Constants.AgedBrie, Constants.Sulfuras, Constants.BackstagePasses, OtherProduct };
 
         [Theory]
-        [InlineData(Program.Sulfuras)]
+        [InlineData(Constants.Sulfuras)]
         [InlineData(OtherProduct)]
         public void TheQualityDegradesTwiceAsFastAfterSellByDate(string productName)
         {
@@ -56,7 +56,7 @@ namespace GildedRose.Tests
         public void AgedBrieQualityIncreaseInQualityAsItGetsOlder(int sellInDays)
         {
             // Arrange
-            var item = CreateItemWith(Program.AgedBrie, QualityOf20, sellIn: sellInDays);
+            var item = CreateItemWith(Constants.AgedBrie, QualityOf20, sellIn: sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -93,7 +93,7 @@ namespace GildedRose.Tests
         {
             // Arrange
             const int qualityOf80 = 80;
-            var item = CreateItemWith(Program.Sulfuras, qualityOf80, sellInDays);
+            var item = CreateItemWith(Constants.Sulfuras, qualityOf80, sellInDays);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -106,7 +106,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByOneWhenGreaterThanTenDaysToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 11);
+            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 11);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -119,7 +119,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByTwoWhenTenDaysOrLessToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 10);
+            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 10);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -132,7 +132,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIncreasesByThreeWhenFiveDaysOrLessToSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 5);
+            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 5);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -145,7 +145,7 @@ namespace GildedRose.Tests
         public void BackStagePassQualityIsZeroAfterSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Program.BackstagePasses, QualityOf20, sellIn: 0);
+            var item = CreateItemWith(Constants.BackstagePasses, QualityOf20, sellIn: 0);
 
             // Act
             ExecuteUpdateQuality(item);
@@ -159,7 +159,7 @@ namespace GildedRose.Tests
         public void AgedBrieQualityIncreaseTwiceAsFastAfterSellByDate()
         {
             // Arrange
-            var item = CreateItemWith(Program.AgedBrie, 0, 0);
+            var item = CreateItemWith(Constants.AgedBrie, 0, 0);
 
             // Act
             ExecuteUpdateQuality(item);

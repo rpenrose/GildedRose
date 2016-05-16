@@ -12,7 +12,7 @@ namespace GildedRose.Tests.Calculators
         public void QuantityCanNotExceedMaximum(int initialQuality, int increment)
         {
             var quality = CalculateQuality(initialQuality, increment);
-            Assert.Equal(Program.MaximumQuality, quality);
+            Assert.Equal(Constants.MaximumQuality, quality);
         }
 
         [Theory]

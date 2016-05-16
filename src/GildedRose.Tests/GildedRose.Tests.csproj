@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calculators\QualityCalculatorFactoryTests.cs" />
     <Compile Include="Calculators\QualityIncrementorTests.cs" />
     <Compile Include="Calculators\IncrementingQualityCalculatorTests.cs" />
     <Compile Include="Calculators\NoChangeQualityCalculatorTests.cs" />

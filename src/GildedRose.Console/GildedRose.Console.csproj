@@ -44,8 +44,10 @@
     <Compile Include="Calculators\IQualityCalculator.cs" />
     <Compile Include="Calculators\IncrementingQualityCalculator.cs" />
     <Compile Include="Calculators\NoChangeQualityCalculator.cs" />
+    <Compile Include="Calculators\QualityCalculatorFactory.cs" />
     <Compile Include="Calculators\QualityIncrementor.cs" />
     <Compile Include="Calculators\StepIncrementingQualityCalculator.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

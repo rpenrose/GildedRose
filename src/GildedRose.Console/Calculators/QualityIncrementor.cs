@@ -14,7 +14,7 @@
             if (quality < 0)
                 quality = 0;
 
-            return quality > Program.MaximumQuality ? Program.MaximumQuality : quality;
+            return quality > Constants.MaximumQuality ? Constants.MaximumQuality : quality;
         }
     }
 }
