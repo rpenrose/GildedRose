@@ -1,6 +1,6 @@
 ## Richard's Notes
 
-### Aged Brie - interesting behaviour
+### Interesting behaviour
 When writing the initial set of tests I noticed that the quality of Aged Brie actually increases twice as fast after the Sell By Date. This is not specified in the requirements, but I have written a test for this behaviour and have preserved it in the re factored code.
 
 I also noticed that when an item has an initial Quality of > 50 then the Quality will be reduced just like and other Quality value, even if the Quality remains above the 50 threshold. However, the code will never increase a Quality above 50. This is implied in the specification, but very subtly. 
